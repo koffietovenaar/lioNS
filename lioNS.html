@@ -1,0 +1,894 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>LioNS — Elementeneditie</title>
+  <meta name="description" content="LioNS is een jaarlijks congres voor leraren in opleiding Natuurkunde & Scheikunde. Programma, lokalen, workshops en praktische info." />
+  <style>
+    :root{
+      --bg:#070A12;
+      --panel:rgba(255,255,255,.06);
+      --panel2:rgba(255,255,255,.09);
+      --line:rgba(255,255,255,.12);
+      --text:#EAF0FF;
+      --muted:rgba(234,240,255,.72);
+
+      --fire:#ff6a3d;
+      --water:#36c6ff;
+      --air:#a7b8ff;
+      --earth:#7dffb3;
+
+      --shadow: 0 18px 60px rgba(0,0,0,.55);
+      --radius:18px;
+      --radius2:28px;
+
+      --w: min(1120px, calc(100vw - 44px));
+      --speed: 12s;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background:
+        radial-gradient(1200px 800px at 15% 10%, rgba(54,198,255,.12), transparent 55%),
+        radial-gradient(1100px 700px at 85% 20%, rgba(255,106,61,.11), transparent 60%),
+        radial-gradient(900px 700px at 70% 85%, rgba(125,255,179,.09), transparent 60%),
+        radial-gradient(900px 700px at 30% 85%, rgba(167,184,255,.08), transparent 60%),
+        linear-gradient(180deg, #050712, #070A12 55%, #050712);
+      color:var(--text);
+      font: 15px/1.55 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+      overflow-x:hidden;
+    }
+
+    a{color:inherit}
+    .wrap{width:var(--w); margin:0 auto}
+
+    /* ====== Topbar ====== */
+    .topbar{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(10px);
+      background: rgba(7,10,18,.72);
+      border-bottom: 1px solid var(--line);
+    }
+    .topbar-inner{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 12px 0;
+      gap:14px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      text-decoration:none;
+      white-space:nowrap;
+    }
+    .mark{
+      width:38px; height:38px; border-radius:12px;
+      background:
+        radial-gradient(12px 12px at 30% 30%, rgba(255,255,255,.24), transparent 55%),
+        conic-gradient(from 210deg, var(--fire), var(--water), var(--air), var(--earth), var(--fire));
+      box-shadow: 0 10px 22px rgba(0,0,0,.45);
+      border:1px solid rgba(255,255,255,.18);
+    }
+    .brand b{letter-spacing:.2px}
+    .brand small{display:block; color:var(--muted); margin-top:-2px; font-size:12px}
+
+    .nav{
+      display:flex; align-items:center; gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .nav a{
+      text-decoration:none;
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid transparent;
+      color:var(--muted);
+      font-size:13px;
+    }
+    .nav a:hover{
+      border-color: var(--line);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+    }
+    .cta{
+      padding:9px 12px !important;
+      border:1px solid rgba(255,255,255,.18) !important;
+      background: linear-gradient(90deg, rgba(255,106,61,.18), rgba(54,198,255,.16));
+      color: var(--text) !important;
+    }
+
+    /* ====== Hero ====== */
+    header.hero{
+      position:relative;
+      padding: 54px 0 18px;
+    }
+    .hero-grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 18px;
+      align-items:stretch;
+    }
+    @media (max-width: 920px){
+      .hero-grid{grid-template-columns:1fr; }
+    }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+      border:1px solid var(--line);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+    }
+    .hero-main{
+      padding: 22px 22px 18px;
+      overflow:hidden;
+      position:relative;
+    }
+    .hero-main h1{
+      margin: 2px 0 8px;
+      font-size: 34px;
+      line-height:1.08;
+      letter-spacing:.2px;
+    }
+    .hero-main p{margin:0; color:var(--muted); max-width: 62ch}
+    .chips{display:flex; flex-wrap:wrap; gap:10px; margin-top:14px}
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:7px 10px;
+      border-radius: 999px;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.16);
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .dot{width:10px;height:10px;border-radius:999px; background: var(--air); box-shadow:0 0 20px rgba(167,184,255,.35)}
+    .dot.fire{background:var(--fire); box-shadow:0 0 20px rgba(255,106,61,.35)}
+    .dot.water{background:var(--water); box-shadow:0 0 20px rgba(54,198,255,.35)}
+    .dot.earth{background:var(--earth); box-shadow:0 0 20px rgba(125,255,179,.35)}
+
+    .hero-side{
+      padding: 18px;
+      display:flex;
+      flex-direction:column;
+      gap: 12px;
+    }
+    .mini{
+      border-radius: var(--radius);
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      padding: 14px 14px 12px;
+    }
+    .mini h3{margin:0 0 6px; font-size: 14px; letter-spacing:.2px}
+    .mini p{margin:0; color:var(--muted); font-size:13px}
+    .mini .row{
+      margin-top:10px;
+      display:flex; gap:10px; flex-wrap:wrap;
+    }
+    .pill{
+      padding:8px 10px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.18);
+      font-size:13px;
+      color: var(--text);
+      text-decoration:none;
+      cursor:pointer;
+    }
+    .pill:hover{background: rgba(255,255,255,.06)}
+
+    /* ====== Element ribbon ====== */
+    .ribbon{
+      margin-top: 14px;
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 920px){
+      .ribbon{grid-template-columns:1fr 1fr}
+    }
+    .elem{
+      padding: 14px 14px 12px;
+      border-radius: var(--radius);
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      position:relative;
+      overflow:hidden;
+      min-height: 76px;
+    }
+    .elem b{display:block; font-size:13px; margin-bottom:4px}
+    .elem span{color:var(--muted); font-size:12px}
+    .elem::after{
+      content:"";
+      position:absolute; inset:-30px -60px;
+      background: radial-gradient(160px 120px at 20% 35%, rgba(255,255,255,.16), transparent 60%);
+      transform: rotate(12deg);
+      opacity:.6;
+    }
+    .elem.fire{border-color: rgba(255,106,61,.25)}
+    .elem.water{border-color: rgba(54,198,255,.22)}
+    .elem.air{border-color: rgba(167,184,255,.22)}
+    .elem.earth{border-color: rgba(125,255,179,.20)}
+    .elem.fire::after{background: radial-gradient(170px 130px at 15% 35%, rgba(255,106,61,.18), transparent 62%)}
+    .elem.water::after{background: radial-gradient(170px 130px at 15% 35%, rgba(54,198,255,.16), transparent 62%)}
+    .elem.air::after{background: radial-gradient(170px 130px at 15% 35%, rgba(167,184,255,.15), transparent 62%)}
+    .elem.earth::after{background: radial-gradient(170px 130px at 15% 35%, rgba(125,255,179,.14), transparent 62%)}
+
+    /* ====== Sections ====== */
+    section{padding: 18px 0}
+    .section-title{
+      display:flex; align-items:flex-end; justify-content:space-between; gap:12px;
+      margin: 16px 0 10px;
+    }
+    .section-title h2{margin:0; font-size:18px}
+    .section-title p{margin:0; color:var(--muted); font-size:13px}
+
+    .grid2{display:grid; grid-template-columns: 1fr 1fr; gap: 12px}
+    @media (max-width: 920px){ .grid2{grid-template-columns:1fr} }
+
+    .box{
+      padding: 16px;
+      border-radius: var(--radius2);
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+    }
+    .box h3{margin:0 0 8px; font-size:15px}
+    .box p{margin:0; color:var(--muted)}
+    .box ul{margin:10px 0 0 18px; color:var(--muted)}
+    .box li{margin:6px 0}
+
+    /* ====== Program table ====== */
+    table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border-radius: var(--radius2);
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.035);
+    }
+    th,td{
+      padding: 12px 12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      vertical-align:top;
+    }
+    th{
+      text-align:left;
+      color: rgba(234,240,255,.86);
+      font-size:13px;
+      background: rgba(0,0,0,.18);
+      position:sticky; top:62px; /* under topbar */
+      z-index:2;
+    }
+    tr:last-child td{border-bottom:none}
+    .time{white-space:nowrap; font-variant-numeric: tabular-nums}
+    .loc{color: var(--muted); font-size:13px; margin-top:2px}
+    .tagrow{margin-top:8px; display:flex; gap:8px; flex-wrap:wrap}
+    .tag{
+      display:inline-flex; align-items:center; gap:7px;
+      padding:6px 9px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.16);
+      color: rgba(234,240,255,.86);
+      font-size:12px;
+    }
+    .tag i{
+      width:10px;height:10px;border-radius:999px; background: var(--air);
+      box-shadow: 0 0 18px rgba(167,184,255,.22);
+      display:inline-block;
+    }
+    .tag i.fire{background:var(--fire); box-shadow:0 0 18px rgba(255,106,61,.22)}
+    .tag i.water{background:var(--water); box-shadow:0 0 18px rgba(54,198,255,.22)}
+    .tag i.earth{background:var(--earth); box-shadow:0 0 18px rgba(125,255,179,.22)}
+
+    /* ====== Rooms ====== */
+    .rooms{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 1040px){ .rooms{grid-template-columns:1fr 1fr} }
+    @media (max-width: 720px){ .rooms{grid-template-columns:1fr} }
+
+    .room{
+      border-radius: var(--radius2);
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      overflow:hidden;
+      position:relative;
+    }
+    .room .head{
+      padding: 14px 14px 10px;
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.14);
+    }
+    .room .head b{font-size:14px}
+    .room .head small{display:block; color:var(--muted); margin-top:2px}
+    .room .body{padding: 12px 14px 14px; color:var(--muted)}
+    .room .list{margin:10px 0 0 16px}
+    .room .list li{margin:6px 0}
+    .badge{
+      padding:7px 9px;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.03);
+      color: rgba(234,240,255,.88);
+      font-size:12px;
+      display:inline-flex; align-items:center; gap:8px;
+      white-space:nowrap;
+    }
+    .badge .b{width:10px;height:10px;border-radius:999px; background:var(--air)}
+    .badge.fire .b{background:var(--fire)}
+    .badge.water .b{background:var(--water)}
+    .badge.earth .b{background:var(--earth)}
+
+    /* ====== Footer ====== */
+    footer{
+      padding: 28px 0 40px;
+      color: var(--muted);
+    }
+    .foot{
+      display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;
+      border-top:1px solid var(--line);
+      padding-top: 16px;
+    }
+    .foot a{color: rgba(234,240,255,.9)}
+    .muted{color:var(--muted)}
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+      padding:2px 6px; border-radius:8px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.18);
+      color: rgba(234,240,255,.88);
+      font-size:12px;
+    }
+
+    /* ====== Modal ====== */
+    .modal{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.62);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      z-index:100;
+    }
+    .modal.open{display:flex}
+    .modal .panel{
+      width: min(820px, 100%);
+      border-radius: var(--radius2);
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(10,12,22,.92);
+      box-shadow: 0 26px 80px rgba(0,0,0,.65);
+      overflow:hidden;
+    }
+    .modal .panel .top{
+      padding: 14px 16px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+    }
+    .modal .panel .top b{font-size:14px}
+    .modal .panel .content{padding: 14px 16px 16px; color: var(--muted)}
+    .x{
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.04);
+      color: rgba(234,240,255,.92);
+      border-radius: 12px;
+      padding: 8px 10px;
+      cursor:pointer;
+      font-size:13px;
+    }
+    .x:hover{background: rgba(255,255,255,.07)}
+    .hint{margin-top:10px; font-size:13px}
+    .hint code{font-size:12px}
+  </style>
+</head>
+
+<body>
+  <!-- ====== CONFIG ======
+    Vul hieronder jullie eigen gegevens in. Alles wordt automatisch op de pagina gezet.
+  -->
+  <script>
+    const LIONS = {
+      editionTitle: "LioNS — Elementeneditie",
+      subtitle: "Congres voor leraren in opleiding Natuurkunde & Scheikunde",
+      dateText: "Vul datum in (bijv. 24 april 2026)",
+      locationText: "Vul locatie in (campus + plaats)",
+      hostText: "Georganiseerd door 2e-jaars studenten (jullie hogeschool)",
+
+      // Programma: voorbeeld gebaseerd op veelgebruikte LioNS-opbouw (inloop → opening/keynote → workshop rondes → lunch → afsluiting → borrel)
+      schedule: [
+        { start:"09:30", end:"10:00", title:"Inloop", where:"Ingang / ontvangstbalie", tags:["air"], note:"Ontvangst, badges, routekaart. Eventueel: ticket-uitgifte workshops." },
+        { start:"10:00", end:"11:00", title:"Opening + Keynote", where:"Auditorium (vul lokaal in)", tags:["fire"], note:"Welkomstwoord, thema-intro, keynote spreker." },
+        { start:"11:15", end:"12:45", title:"Workshopronde 1", where:"Diverse lokalen", tags:["water"], note:"Deelnemers volgen één workshop in ronde 1." },
+        { start:"12:45", end:"13:45", title:"Lunch", where:"Plein / banken / kantine (vul plek in)", tags:["earth"], note:"Lunch + netwerkmoment. Houd rekening met dieetwensen." },
+        { start:"13:45", end:"15:15", title:"Workshopronde 2", where:"Diverse lokalen", tags:["water"], note:"Deelnemers volgen één workshop in ronde 2." },
+        { start:"15:15", end:"16:00", title:"Afsluitende activiteit", where:"Auditorium / grote ruimte", tags:["air"], note:"Bijv. gezamenlijke challenge, escaperoom-variant, pubquiz-light." },
+        { start:"16:00", end:"17:00", title:"Borrel", where:"Plein / kantine (vul plek in)", tags:["fire"], note:"Informeel afsluiten. Optioneel: prijsuitreiking / shout-outs." }
+      ],
+
+      // Lokalen en wat daar te doen is (pas aan op basis van jullie campusindeling)
+      rooms: [
+        { name:"Auditorium", code:"(vul lokaalcode in)", element:"fire", purpose:"Opening, keynote en afsluiting", details:[
+          "Start & einde van de dag",
+          "Thema-intro: Elementen (vuur, water, lucht, aarde)",
+          "Grote opstelling + AV"
+        ]},
+        { name:"Workshopstraat A", code:"(vul lokaalcode in)", element:"water", purpose:"Workshops ronde 1 & 2", details:[
+          "Ronde 1: lokalen A1–A4",
+          "Ronde 2: lokalen A1–A4",
+          "Bij elk lokaal: deurposter met workshop + element"
+        ]},
+        { name:"Workshopstraat B", code:"(vul lokaalcode in)", element:"air", purpose:"Workshops ronde 1 & 2", details:[
+          "Ronde 1: lokalen B1–B4",
+          "Ronde 2: lokalen B1–B4",
+          "Extra: demo-hoekje voor mini-proefjes"
+        ]},
+        { name:"Lunch & Borrel", code:"(vul plek in)", element:"earth", purpose:"Lunch, pauzes en borrel", details:[
+          "Catering-uitgifte + waterpunten",
+          "Netwerktafels (opleiding per tafel)",
+          "Afvalscheiding + opruimroutines"
+        ]},
+        { name:"Info-desk", code:"(vul plek in)", element:"air", purpose:"Vragen, routes, EHBO-contact", details:[
+          "Planning en plattegrond",
+          "Vragen over lokalen en workshops",
+          "Sleutels/techniekcontact"
+        ]},
+        { name:"Stilteruimte / Prikkelarm", code:"(vul plek in)", element:"water", purpose:"Rustmoment", details:[
+          "Rustige plek zonder programma",
+          "Duidelijk aangeven op plattegrond",
+          "Fijn bij lange reisdag"
+        ]}
+      ],
+
+      // Workshops (jullie kunnen hier later titels + beschrijvingen invullen)
+      workshopInfo: {
+        howItWorks: [
+          "Oriënteer je vooraf op de workshops.",
+          "Bij binnenkomst ontvang je 2 keuzes (één voor ronde 1, één voor ronde 2).",
+          "Per workshop is er een maximum aantal plekken (bijv. ±20).",
+          "Zonder bevestiging/plek kun je het lokaal niet in."
+        ],
+        round1: [
+          { title:"Workshop 1 (vul in)", desc:"Korte beschrijving + welk element past erbij." },
+          { title:"Workshop 2 (vul in)", desc:"Korte beschrijving + welk element past erbij." },
+          { title:"Workshop 3 (vul in)", desc:"Korte beschrijving + welk element past erbij." }
+        ],
+        round2: [
+          { title:"Workshop 4 (vul in)", desc:"Korte beschrijving + welk element past erbij." },
+          { title:"Workshop 5 (vul in)", desc:"Korte beschrijving + welk element past erbij." },
+          { title:"Workshop 6 (vul in)", desc:"Korte beschrijving + welk element past erbij." }
+        ]
+      },
+
+      practical: {
+        travel: [
+          "Reis bij voorkeur met het OV; deel in de uitnodiging het dichtstbijzijnde station + looproute/bus.",
+          "Kom je met de auto: vermeld parkeergarage/terreinen + eventuele slagboom/aanmeldprocedure."
+        ],
+        whatToBring: [
+          "Laptop/tablet (optioneel, afhankelijk van workshops)",
+          "Pen/papier",
+          "Waterfles"
+        ],
+        contacts: [
+          { role:"Algemeen aanspreekpunt", name:"(naam)", detail:"(telefoon/mail)" },
+          { role:"Techniek/AV", name:"(naam)", detail:"(telefoon/mail)" },
+          { role:"Catering", name:"(naam)", detail:"(telefoon/mail)" }
+        ]
+      }
+    };
+  </script>
+
+  <div class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="#top">
+        <span class="mark" aria-hidden="true"></span>
+        <span>
+          <b id="brandTitle">LioNS</b>
+          <small id="brandSub">Elementeneditie</small>
+        </span>
+      </a>
+
+      <nav class="nav" aria-label="Navigatie">
+        <a href="#over">Over</a>
+        <a href="#programma">Programma</a>
+        <a href="#lokalen">Lokalen</a>
+        <a href="#workshops">Workshops</a>
+        <a href="#praktisch">Praktisch</a>
+        <a href="#contact" class="cta">Contact</a>
+      </nav>
+    </div>
+  </div>
+
+  <main id="top">
+    <header class="hero">
+      <div class="wrap hero-grid">
+        <div class="card hero-main">
+          <h1 id="heroTitle">LioNS — Elementeneditie</h1>
+          <p id="heroSub">
+            Een landelijke ontmoetingsdag voor leraren in opleiding Natuurkunde & Scheikunde: workshops, inspiratie en kennismaken met studenten van andere hogescholen.
+          </p>
+
+          <div class="chips" aria-label="Snelle info">
+            <span class="chip"><span class="dot air"></span><span id="heroDate">Datum</span></span>
+            <span class="chip"><span class="dot water"></span><span id="heroLoc">Locatie</span></span>
+            <span class="chip"><span class="dot earth"></span><span id="heroHost">Organisatie</span></span>
+            <span class="chip"><span class="dot fire"></span><span>Thema: Elementen</span></span>
+          </div>
+
+          <div class="ribbon" aria-label="Elementen">
+            <div class="elem fire"><b>Vuur</b><span>Energie, reactie, vonk</span></div>
+            <div class="elem water"><b>Water</b><span>Stroming, menging, evenwicht</span></div>
+            <div class="elem air"><b>Lucht</b><span>Druk, golven, beweging</span></div>
+            <div class="elem earth"><b>Aarde</b><span>Materie, structuur, kracht</span></div>
+          </div>
+        </div>
+
+        <aside class="card hero-side">
+          <div class="mini">
+            <h3>Wat is LioNS?</h3>
+            <p>
+              LioNS is een jaarlijks congres voor leraren in opleiding Natuurkunde en Scheikunde. Studenten uit heel Nederland komen bij elkaar om workshops te volgen en elkaar te leren kennen.
+            </p>
+          </div>
+
+          <div class="mini">
+            <h3>Snelle acties</h3>
+            <p>Gebruik deze knoppen tijdens het bouwen van jullie site.</p>
+            <div class="row">
+              <button class="pill" id="btnEdit">Waar pas ik alles aan?</button>
+              <a class="pill" href="#programma">Naar programma</a>
+              <a class="pill" href="#lokalen">Naar lokalen</a>
+            </div>
+          </div>
+
+          <div class="mini">
+            <h3>Elementenstijl</h3>
+            <p>
+              Koppel elke ruimte of activiteit aan een element. Dat maakt routes, posters en deurposters meteen duidelijk.
+            </p>
+          </div>
+        </aside>
+      </div>
+    </header>
+
+    <section id="over">
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Over LioNS</h2>
+          <p>Doel, opzet en thema</p>
+        </div>
+
+        <div class="grid2">
+          <div class="box">
+            <h3>Doel van de dag</h3>
+            <ul>
+              <li>Nieuwe ideeën opdoen voor NaSk-onderwijs (didactiek + practica).</li>
+              <li>Workshops volgen die door 2e-jaars studenten zijn ontworpen.</li>
+              <li>Netwerken met studenten van andere hogescholen.</li>
+            </ul>
+          </div>
+
+          <div class="box">
+            <h3>Thema: Elementen</h3>
+            <p>
+              De dag is opgebouwd rondom vier elementen. Elk element heeft een eigen sfeer én een eigen plek in het programma:
+              <span class="kbd">Vuur</span> (opening/energie),
+              <span class="kbd">Water</span> (workshops/flow),
+              <span class="kbd">Lucht</span> (routes/ruimte),
+              <span class="kbd">Aarde</span> (lunch/basis).
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="programma">
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Programma</h2>
+          <p>Globale dagindeling (pas tijden/lokalen aan)</p>
+        </div>
+
+        <table aria-label="Programma">
+          <thead>
+            <tr>
+              <th style="width:140px">Tijd</th>
+              <th>Onderdeel</th>
+              <th style="width:300px">Locatie</th>
+            </tr>
+          </thead>
+          <tbody id="scheduleBody"></tbody>
+        </table>
+
+        <div class="hint muted">
+          Tip: maak voor deelnemers een printbare plattegrond met kleuren per element (Vuur/Water/Lucht/Aarde).
+        </div>
+      </div>
+    </section>
+
+    <section id="lokalen">
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Lokalen & wat daar te doen is</h2>
+          <p>Routes, activiteiten, informatiepunten</p>
+        </div>
+
+        <div class="rooms" id="roomsGrid"></div>
+      </div>
+    </section>
+
+    <section id="workshops">
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Workshops</h2>
+          <p>Ronde 1 & 2 + keuzeproces</p>
+        </div>
+
+        <div class="grid2">
+          <div class="box">
+            <h3>Hoe werkt het kiezen?</h3>
+            <ul id="howWorks"></ul>
+          </div>
+
+          <div class="box">
+            <h3>Workshoprondes</h3>
+            <p class="muted">Vul hieronder de titels en korte beschrijvingen aan. Voeg later eventueel lokaalcodes toe.</p>
+            <div style="margin-top:10px">
+              <b>Ronde 1</b>
+              <ul id="round1"></ul>
+            </div>
+            <div style="margin-top:10px">
+              <b>Ronde 2</b>
+              <ul id="round2"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="praktisch">
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Praktische informatie</h2>
+          <p>Reis, meenemen, aanspreekpunten</p>
+        </div>
+
+        <div class="grid2">
+          <div class="box">
+            <h3>Reis & aankomst</h3>
+            <ul id="travel"></ul>
+            <h3 style="margin-top:14px">Wat neem je mee?</h3>
+            <ul id="bring"></ul>
+          </div>
+
+          <div class="box">
+            <h3>Aanspreekpunten</h3>
+            <ul id="contacts"></ul>
+            <p class="muted" style="margin-top:10px">
+              Plaats op de dag zelf ook een fysieke info-desk bij de ingang (planning + plattegrond).
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="wrap">
+        <div class="section-title">
+          <h2>Contact</h2>
+          <p>Organisatie en vragen</p>
+        </div>
+
+        <div class="box">
+          <h3>Organisatie</h3>
+          <p class="muted">
+            Vul hier jullie organisatienaam, hogeschool en contactmail in. Voeg eventueel een link toe naar aanmelding/Teams/Forms.
+          </p>
+
+          <div class="tagrow" style="margin-top:12px">
+            <span class="tag"><i class="fire"></i>Vuur — Opening/borrel</span>
+            <span class="tag"><i class="water"></i>Water — Workshops</span>
+            <span class="tag"><i></i>Lucht — Routes/Info</span>
+            <span class="tag"><i class="earth"></i>Aarde — Lunch/logistiek</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap foot">
+        <div>
+          <div><b id="footTitle">LioNS — Elementeneditie</b></div>
+          <div class="muted" id="footSub">Datum • Locatie • Organisatie</div>
+        </div>
+        <div class="muted">
+          Snel naar: <a href="#programma">Programma</a> · <a href="#lokalen">Lokalen</a> · <a href="#workshops">Workshops</a>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <!-- Modal: “Waar pas ik alles aan?” -->
+  <div class="modal" id="modal">
+    <div class="panel" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+      <div class="top">
+        <b id="mTitle">Waar pas ik alles aan?</b>
+        <button class="x" id="btnClose" aria-label="Sluiten">Sluiten</button>
+      </div>
+      <div class="content">
+        <p>
+          Bovenin dit bestand staat een blok <span class="kbd">const LIONS = {...}</span>.
+          Daar kun je alle teksten, tijden, lokalen en workshops invullen.
+        </p>
+        <p class="hint">
+          Zoek in de code naar: <code>const LIONS =</code> en pas aan:
+          <br/>• <span class="kbd">dateText</span>, <span class="kbd">locationText</span>, <span class="kbd">hostText</span>
+          <br/>• <span class="kbd">schedule</span> (programma)
+          <br/>• <span class="kbd">rooms</span> (lokalen & activiteiten)
+          <br/>• <span class="kbd">workshopInfo</span> (workshops)
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (s, el=document) => el.querySelector(s);
+    const elTagColor = (tag) => {
+      if(tag === "fire") return { cls:"fire", label:"Vuur" };
+      if(tag === "water") return { cls:"water", label:"Water" };
+      if(tag === "earth") return { cls:"earth", label:"Aarde" };
+      return { cls:"", label:"Lucht" };
+    };
+
+    // Header text
+    $("#brandTitle").textContent = "LioNS";
+    $("#brandSub").textContent = "Elementeneditie";
+    $("#heroTitle").textContent = LIONS.editionTitle;
+    $("#heroSub").textContent  = LIONS.subtitle;
+
+    $("#heroDate").textContent = LIONS.dateText;
+    $("#heroLoc").textContent  = LIONS.locationText;
+    $("#heroHost").textContent = LIONS.hostText;
+
+    $("#footTitle").textContent = LIONS.editionTitle;
+    $("#footSub").textContent = `${LIONS.dateText} • ${LIONS.locationText} • ${LIONS.hostText}`;
+
+    // Schedule
+    const tbody = $("#scheduleBody");
+    LIONS.schedule.forEach(item => {
+      const tr = document.createElement("tr");
+
+      const tdTime = document.createElement("td");
+      tdTime.className = "time";
+      tdTime.textContent = `${item.start}–${item.end}`;
+      tr.appendChild(tdTime);
+
+      const tdTitle = document.createElement("td");
+      const title = document.createElement("div");
+      title.style.fontWeight = "700";
+      title.textContent = item.title;
+
+      const note = document.createElement("div");
+      note.className = "loc";
+      note.textContent = item.note || "";
+
+      const tags = document.createElement("div");
+      tags.className = "tagrow";
+      (item.tags || []).forEach(t => {
+        const span = document.createElement("span");
+        span.className = "tag";
+        const i = document.createElement("i");
+        i.className = elTagColor(t).cls;
+        span.appendChild(i);
+        span.appendChild(document.createTextNode(elTagColor(t).label));
+        tags.appendChild(span);
+      });
+
+      tdTitle.appendChild(title);
+      tdTitle.appendChild(tags);
+      tdTitle.appendChild(note);
+      tr.appendChild(tdTitle);
+
+      const tdWhere = document.createElement("td");
+      tdWhere.innerHTML = `<div style="font-weight:600">${item.where}</div>`;
+      tr.appendChild(tdWhere);
+
+      tbody.appendChild(tr);
+    });
+
+    // Rooms
+    const grid = $("#roomsGrid");
+    LIONS.rooms.forEach(r => {
+      const card = document.createElement("article");
+      card.className = "room";
+
+      const head = document.createElement("div");
+      head.className = "head";
+
+      const left = document.createElement("div");
+      left.innerHTML = `<b>${r.name}</b><small>${r.code}</small>`;
+
+      const badge = document.createElement("span");
+      const e = elTagColor(r.element);
+      badge.className = `badge ${e.cls}`;
+      badge.innerHTML = `<span class="b"></span>${e.label}`;
+
+      head.appendChild(left);
+      head.appendChild(badge);
+
+      const body = document.createElement("div");
+      body.className = "body";
+      body.innerHTML = `<div style="font-weight:650; color: rgba(234,240,255,.9)">${r.purpose}</div>`;
+
+      const ul = document.createElement("ul");
+      ul.className = "list";
+      (r.details || []).forEach(d => {
+        const li = document.createElement("li");
+        li.textContent = d;
+        ul.appendChild(li);
+      });
+
+      body.appendChild(ul);
+      card.appendChild(head);
+      card.appendChild(body);
+
+      grid.appendChild(card);
+    });
+
+    // Workshops lists
+    const fillList = (id, arr) => {
+      const ul = $(id);
+      ul.innerHTML = "";
+      arr.forEach(x => {
+        const li = document.createElement("li");
+        if(typeof x === "string"){
+          li.textContent = x;
+        }else{
+          li.innerHTML = `<b>${x.title}</b> — ${x.desc}`;
+        }
+        ul.appendChild(li);
+      });
+    };
+    fillList("#howWorks", LIONS.workshopInfo.howItWorks);
+    fillList("#round1", LIONS.workshopInfo.round1);
+    fillList("#round2", LIONS.workshopInfo.round2);
+
+    // Practical
+    fillList("#travel", LIONS.practical.travel);
+    fillList("#bring", LIONS.practical.whatToBring);
+
+    const cUl = $("#contacts");
+    LIONS.practical.contacts.forEach(c => {
+      const li = document.createElement("li");
+      li.innerHTML = `<b>${c.role}</b> — ${c.name} <span class="muted">(${c.detail})</span>`;
+      cUl.appendChild(li);
+    });
+
+    // Modal
+    const modal = $("#modal");
+    const open = () => modal.classList.add("open");
+    const close = () => modal.classList.remove("open");
+    $("#btnEdit").addEventListener("click", open);
+    $("#btnClose").addEventListener("click", close);
+    modal.addEventListener("click", (e) => { if(e.target === modal) close(); });
+    document.addEventListener("keydown", (e) => { if(e.key === "Escape") close(); });
+
+    // Smooth scroll for internal links
+    document.querySelectorAll('a[href^="#"]').forEach(a => {
+      a.addEventListener("click", (e) => {
+        const id = a.getAttribute("href");
+        if(!id || id === "#") return;
+        const target = document.querySelector(id);
+        if(!target) return;
+        e.preventDefault();
+        target.scrollIntoView({behavior:"smooth", block:"start"});
+        history.replaceState(null, "", id);
+      });
+    });
+  </script>
+</body>
+</html>
